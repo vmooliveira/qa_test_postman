@@ -1,0 +1,488 @@
+{
+	"info": {
+		"_postman_id": "ecc82ca9-6eca-4f2e-b305-706029860955",
+		"name": "Tokenização PCI - Status Code 4XX",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "35061666",
+		"_collection_link": "https://vitor1-4505.postman.co/workspace/Vitor-Workspace~8ab8d6b2-af75-4fbd-a621-29bfa87b2a61/collection/35061666-ecc82ca9-6eca-4f2e-b305-706029860955?action=share&source=collection_link&creator=35061666"
+	},
+	"item": [
+		{
+			"name": "authentication",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(pm.response.text());\r",
+							"pm.environment.set(\"token\", data.access_token);\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic Njc4MjNjNmQtNThkZS00OTRmLTk2ZDktODZhNGMyMjY4MmNiOmMyZDZhMDZmLTVmMzEtNDQ4Yi05MDc5LTdlMTcwZTg1MzZlNA==",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "scopescope",
+							"value": "oob",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/auth/oauth/v2/token",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"auth",
+						"oauth",
+						"v2",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "status code 400 - card number missing",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test('Schema is valid', function () {\r",
+							"    const schema = {\r",
+							"        \"type\": \"object\",\r",
+							"        \"properties\": {\r",
+							"            \"message\": {\r",
+							"                \"type\": \"string\"\r",
+							"            },\r",
+							"            \"name\": {\r",
+							"                \"type\": \"string\"\r",
+							"            },\r",
+							"            \"status_code\": {\r",
+							"                \"type\": \"number\"\r",
+							"            },\r",
+							"            \"details\": {\r",
+							"                \"type\": \"array\",\r",
+							"                \"items\": {\r",
+							"                    \"type\": \"object\",\r",
+							"                    \"properties\": {\r",
+							"                        \"status\": {\r",
+							"                            \"type\": \"string\"\r",
+							"                        },\r",
+							"                        \"error_code\": {\r",
+							"                            \"type\": \"string\"\r",
+							"                        },\r",
+							"                        \"description\": {\r",
+							"                            \"type\": \"string\"\r",
+							"                        },\r",
+							"                        \"description_detail\": {\r",
+							"                            \"type\": \"string\"\r",
+							"                        }\r",
+							"                    },\r",
+							"                    \"required\": [\r",
+							"                        \"status\",\r",
+							"                        \"error_code\",\r",
+							"                        \"description\",\r",
+							"                        \"description_detail\"\r",
+							"                    ]\r",
+							"                }\r",
+							"            }\r",
+							"        },\r",
+							"        \"required\": [\r",
+							"            \"message\",\r",
+							"            \"name\",\r",
+							"            \"status_code\",\r",
+							"            \"details\"\r",
+							"        ]\r",
+							"    }\r",
+							"    \r",
+							"    const Ajv = require(\"ajv\");\r",
+							"    const ajv = new Ajv();\r",
+							"    var jsonData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(ajv.validate(schema, jsonData)).to.be.true;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "headerPrefix",
+							"value": "Bearer",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-type",
+						"value": "application/json; charset=utf-8",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "seller_id",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"card_number\": \"\",\r\n  \"customer_id\": \"\"\r\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/v1/tokens/card",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"tokens",
+						"card"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "status code 401 -  invalid authentication token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {\r",
+							"    pm.response.to.have.status(401);\r",
+							"});\r",
+							"\r",
+							"pm.test('Schema is valid', function () {\r",
+							"    const schema = {\r",
+							"        \"type\": \"object\",\r",
+							"        \"properties\": {\r",
+							"            \"message\": {\r",
+							"                \"type\": \"string\"\r",
+							"            },\r",
+							"            \"name\": {\r",
+							"                \"type\": \"string\"\r",
+							"            },\r",
+							"            \"status_code\": {\r",
+							"                \"type\": \"number\"\r",
+							"            },\r",
+							"            \"details\": {\r",
+							"                \"type\": \"array\",\r",
+							"                \"items\": {\r",
+							"                    \"type\": \"object\",\r",
+							"                    \"properties\": {\r",
+							"                        \"status\": {\r",
+							"                            \"type\": \"string\"\r",
+							"                        },\r",
+							"                        \"error_code\": {\r",
+							"                            \"type\": \"string\"\r",
+							"                        },\r",
+							"                        \"description\": {\r",
+							"                            \"type\": \"string\"\r",
+							"                        },\r",
+							"                        \"description_detail\": {\r",
+							"                            \"type\": \"string\"\r",
+							"                        }\r",
+							"                    },\r",
+							"                    \"required\": [\r",
+							"                        \"status\",\r",
+							"                        \"error_code\",\r",
+							"                        \"description\",\r",
+							"                        \"description_detail\"\r",
+							"                    ]\r",
+							"                }\r",
+							"            }\r",
+							"        },\r",
+							"        \"required\": [\r",
+							"            \"message\",\r",
+							"            \"name\",\r",
+							"            \"status_code\",\r",
+							"            \"details\"\r",
+							"        ]\r",
+							"    }\r",
+							"    \r",
+							"    const Ajv = require(\"ajv\");\r",
+							"    const ajv = new Ajv();\r",
+							"    var jsonData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(ajv.validate(schema, jsonData)).to.be.true;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "headerPrefix",
+							"value": "Bearer",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-type",
+						"value": "application/json; charset=utf-8",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{invalid_token}}",
+						"type": "text"
+					},
+					{
+						"key": "seller_id",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"card_number\": \"{{master_valid_card}}\",\r\n  \"customer_id\": \"\"\r\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/v1/tokens/card",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"tokens",
+						"card"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "status code 404 - url not found",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});\r",
+							"\r",
+							"pm.test('Schema is valid', function () {\r",
+							"    const schema = {\r",
+							"        \"type\": \"object\",\r",
+							"        \"properties\": {\r",
+							"            \"message\": {\r",
+							"                \"type\": \"string\"\r",
+							"            },\r",
+							"            \"name\": {\r",
+							"                \"type\": \"string\"\r",
+							"            },\r",
+							"            \"status_code\": {\r",
+							"                \"type\": \"number\"\r",
+							"            },\r",
+							"            \"details\": {\r",
+							"                \"type\": \"array\",\r",
+							"                \"items\": {\r",
+							"                    \"type\": \"object\",\r",
+							"                    \"properties\": {\r",
+							"                        \"status\": {\r",
+							"                            \"type\": \"string\"\r",
+							"                        },\r",
+							"                        \"error_code\": {\r",
+							"                            \"type\": \"string\"\r",
+							"                        },\r",
+							"                        \"description\": {\r",
+							"                            \"type\": \"string\"\r",
+							"                        },\r",
+							"                        \"description_detail\": {\r",
+							"                            \"type\": \"string\"\r",
+							"                        }\r",
+							"                    },\r",
+							"                    \"required\": [\r",
+							"                        \"status\",\r",
+							"                        \"error_code\",\r",
+							"                        \"description\",\r",
+							"                        \"description_detail\"\r",
+							"                    ]\r",
+							"                }\r",
+							"            }\r",
+							"        },\r",
+							"        \"required\": [\r",
+							"            \"message\",\r",
+							"            \"name\",\r",
+							"            \"status_code\",\r",
+							"            \"details\"\r",
+							"        ]\r",
+							"    }\r",
+							"    const Ajv = require(\"ajv\");\r",
+							"    const ajv = new Ajv();\r",
+							"    var jsonData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(ajv.validate(schema, jsonData)).to.be.true;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "headerPrefix",
+							"value": "Bearer",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-type",
+						"value": "application/json; charset=utf-8",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "seller_id",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"card_number\": \"{{master_valid_card}}\",\r\n  \"customer_id\": \"\"\r\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/v1/tokens/cards",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"tokens",
+						"cards"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

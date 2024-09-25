@@ -1,0 +1,966 @@
+{
+	"info": {
+		"_postman_id": "103c8025-4785-46d8-bbb2-e94581a0820c",
+		"name": "Tokenização PCI - Status Code 201",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "35061666",
+		"_collection_link": "https://vitor1-4505.postman.co/workspace/Vitor-Workspace~8ab8d6b2-af75-4fbd-a621-29bfa87b2a61/collection/35061666-103c8025-4785-46d8-bbb2-e94581a0820c?action=share&source=collection_link&creator=35061666"
+	},
+	"item": [
+		{
+			"name": "authentication",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(pm.response.text());\r",
+							"pm.environment.set(\"token\", data.access_token);\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic Njc4MjNjNmQtNThkZS00OTRmLTk2ZDktODZhNGMyMjY4MmNiOmMyZDZhMDZmLTVmMzEtNDQ4Yi05MDc5LTdlMTcwZTg1MzZlNA==",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "scopescope",
+							"value": "oob",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/auth/oauth/v2/token",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"auth",
+						"oauth",
+						"v2",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mastercard authorized transaction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test('Schema is valid', function () {\r",
+							"    const schema = {\r",
+							"        \"properties\": {\r",
+							"            \"number_token\": {\r",
+							"                \"type\": \"string\"\r",
+							"            }\r",
+							"        },\r",
+							"        \"required\": [\r",
+							"            \"number_token\"\r",
+							"        ]\r",
+							"    }\r",
+							"    const Ajv = require(\"ajv\");\r",
+							"    const ajv = new Ajv();\r",
+							"    var jsonData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(ajv.validate(schema, jsonData)).to.be.true;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "headerPrefix",
+							"value": "Bearer",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-type",
+						"value": "application/json; charset=utf-8",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "seller_id",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"card_number\": \"{{master_valid_card}}\",\r\n  \"customer_id\": \"\"\r\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/v1/tokens/card",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"tokens",
+						"card"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mastercard invalid card",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test('Schema is valid', function () {\r",
+							"    const schema = {\r",
+							"        \"properties\": {\r",
+							"            \"number_token\": {\r",
+							"                \"type\": \"string\"\r",
+							"            }\r",
+							"        },\r",
+							"        \"required\": [\r",
+							"            \"number_token\"\r",
+							"        ]\r",
+							"    }\r",
+							"    const Ajv = require(\"ajv\");\r",
+							"    const ajv = new Ajv();\r",
+							"    var jsonData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(ajv.validate(schema, jsonData)).to.be.true;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "headerPrefix",
+							"value": "Bearer",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-type",
+						"value": "application/json; charset=utf-8",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "seller_id",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"card_number\": \"{{invalid_card}}\",\r\n  \"customer_id\": \"\"\r\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/v1/tokens/card",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"tokens",
+						"card"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mastercard expired card",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test('Schema is valid', function () {\r",
+							"    const schema = {\r",
+							"        \"properties\": {\r",
+							"            \"number_token\": {\r",
+							"                \"type\": \"string\"\r",
+							"            }\r",
+							"        },\r",
+							"        \"required\": [\r",
+							"            \"number_token\"\r",
+							"        ]\r",
+							"    }\r",
+							"    const Ajv = require(\"ajv\");\r",
+							"    const ajv = new Ajv();\r",
+							"    var jsonData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(ajv.validate(schema, jsonData)).to.be.true;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "headerPrefix",
+							"value": "Bearer",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-type",
+						"value": "application/json; charset=utf-8",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "seller_id",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"card_number\": \"{{expired_card}}\",\r\n  \"customer_id\": \"\"\r\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/v1/tokens/card",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"tokens",
+						"card"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mastercard invalid establishment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test('Schema is valid', function () {\r",
+							"    const schema = {\r",
+							"        \"properties\": {\r",
+							"            \"number_token\": {\r",
+							"                \"type\": \"string\"\r",
+							"            }\r",
+							"        },\r",
+							"        \"required\": [\r",
+							"            \"number_token\"\r",
+							"        ]\r",
+							"    }\r",
+							"    const Ajv = require(\"ajv\");\r",
+							"    const ajv = new Ajv();\r",
+							"    var jsonData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(ajv.validate(schema, jsonData)).to.be.true;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "headerPrefix",
+							"value": "Bearer",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-type",
+						"value": "application/json; charset=utf-8",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "seller_id",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"card_number\": \"{{invalid_ establishment_card}}\",\r\n  \"customer_id\": \"\"\r\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/v1/tokens/card",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"tokens",
+						"card"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mastercard insufficient balance",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test('Schema is valid', function () {\r",
+							"    const schema = {\r",
+							"        \"properties\": {\r",
+							"            \"number_token\": {\r",
+							"                \"type\": \"string\"\r",
+							"            }\r",
+							"        },\r",
+							"        \"required\": [\r",
+							"            \"number_token\"\r",
+							"        ]\r",
+							"    }\r",
+							"    const Ajv = require(\"ajv\");\r",
+							"    const ajv = new Ajv();\r",
+							"    var jsonData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(ajv.validate(schema, jsonData)).to.be.true;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "headerPrefix",
+							"value": "Bearer",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-type",
+						"value": "application/json; charset=utf-8",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "seller_id",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"card_number\": \"{{insufficient_balance_card}}\",\r\n  \"customer_id\": \"\"\r\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/v1/tokens/card",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"tokens",
+						"card"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mastercard authorization refused",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test('Schema is valid', function () {\r",
+							"    const schema = {\r",
+							"        \"properties\": {\r",
+							"            \"number_token\": {\r",
+							"                \"type\": \"string\"\r",
+							"            }\r",
+							"        },\r",
+							"        \"required\": [\r",
+							"            \"number_token\"\r",
+							"        ]\r",
+							"    }\r",
+							"    const Ajv = require(\"ajv\");\r",
+							"    const ajv = new Ajv();\r",
+							"    var jsonData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(ajv.validate(schema, jsonData)).to.be.true;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "headerPrefix",
+							"value": "Bearer",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-type",
+						"value": "application/json; charset=utf-8",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "seller_id",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"card_number\": \"{{authorization_refused_card}}\",\r\n  \"customer_id\": \"\"\r\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/v1/tokens/card",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"tokens",
+						"card"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mastercard unprocessed transaction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test('Schema is valid', function () {\r",
+							"    const schema = {\r",
+							"        \"properties\": {\r",
+							"            \"number_token\": {\r",
+							"                \"type\": \"string\"\r",
+							"            }\r",
+							"        },\r",
+							"        \"required\": [\r",
+							"            \"number_token\"\r",
+							"        ]\r",
+							"    }\r",
+							"    const Ajv = require(\"ajv\");\r",
+							"    const ajv = new Ajv();\r",
+							"    var jsonData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(ajv.validate(schema, jsonData)).to.be.true;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "headerPrefix",
+							"value": "Bearer",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-type",
+						"value": "application/json; charset=utf-8",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "seller_id",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"card_number\": \"{{unprocessed_transaction_card}}\",\r\n  \"customer_id\": \"\"\r\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/v1/tokens/card",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"tokens",
+						"card"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mastercard  exceeds withdrawal limit",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test('Schema is valid', function () {\r",
+							"    const schema = {\r",
+							"        \"properties\": {\r",
+							"            \"number_token\": {\r",
+							"                \"type\": \"string\"\r",
+							"            }\r",
+							"        },\r",
+							"        \"required\": [\r",
+							"            \"number_token\"\r",
+							"        ]\r",
+							"    }\r",
+							"    const Ajv = require(\"ajv\");\r",
+							"    const ajv = new Ajv();\r",
+							"    var jsonData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(ajv.validate(schema, jsonData)).to.be.true;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "headerPrefix",
+							"value": "Bearer",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-type",
+						"value": "application/json; charset=utf-8",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "seller_id",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"card_number\": \"{{exceeded_withdrawal_card}}\",\r\n  \"customer_id\": \"\"\r\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/v1/tokens/card",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"tokens",
+						"card"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "visa authorized transaction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test('Schema is valid', function () {\r",
+							"    const schema = {\r",
+							"        \"properties\": {\r",
+							"            \"number_token\": {\r",
+							"                \"type\": \"string\"\r",
+							"            }\r",
+							"        },\r",
+							"        \"required\": [\r",
+							"            \"number_token\"\r",
+							"        ]\r",
+							"    }\r",
+							"    const Ajv = require(\"ajv\");\r",
+							"    const ajv = new Ajv();\r",
+							"    var jsonData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(ajv.validate(schema, jsonData)).to.be.true;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "headerPrefix",
+							"value": "Bearer",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-type",
+						"value": "application/json; charset=utf-8",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "seller_id",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"card_number\": \"{{visa_valid_card}}\",\r\n  \"customer_id\": \"\"\r\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/v1/tokens/card",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"tokens",
+						"card"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
